@@ -48,10 +48,6 @@ updateLink: (parent, args) => {
   },
 */
 
-function updateLink(parent, args, context, info) {
-    const userId = getUserId(context);
-}
-
 async function signup(parent, args, context, info) {
     const hashedPassword = await bcrypt.hash(args.password, 10);
     const { password, ...user } = await context.prisma.createUser({
