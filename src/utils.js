@@ -16,4 +16,4 @@ function getUserId(context) {
 module.exports = {
     APP_SECRET,
     getUserId,
-  } 
+};
