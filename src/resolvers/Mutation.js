@@ -25,28 +25,35 @@ function updateLink(parent, args, context, info) {
 
 function deleteLink(parent, args, context, info) {
     const userId = getUserId(context);
+    /*
+    TODO get user.links
+
+    var index = links.findIndex((x) => x.id === args.id);
+    if (index > -1) {
+      links.splice(index, 1);
+    }
+    */
 }
 
-/*
-updateLink: (parent, args) => {
-    if (args.id) {
-      if (args.url) {
-        links.find((x) => x.id === args.id).url = args.url;
-      }
-      if (args.description) {
-        links.find((x) => x.id === args.id).description = args.description;
-      }
+async function vote(parent, args, context, info) {
+    // 1
+    const userId = getUserId(context);
+
+    // 2
+    const voteExists = await context.prisma.$exists.vote({
+        user: { id: userId },
+        link: { id: args.linkId },
+    });
+    if (voteExists) {
+        throw new Error(`Already voted for link: ${args.linkId}`);
     }
-  },
-  deleteLink: (parent, args) => {
-    if (args.id) {
-      var index = links.findIndex((x) => x.id === args.id);
-      if (index > -1) {
-        links.splice(index, 1);
-      }
-    }
-  },
-*/
+
+    // 3
+    return context.prisma.createVote({
+        user: { connect: { id: userId } },
+        link: { connect: { id: args.linkId } },
+    });
+}
 
 async function signup(parent, args, context, info) {
     const hashedPassword = await bcrypt.hash(args.password, 10);
@@ -86,6 +93,7 @@ async function login(parent, args, context, info) {
 module.exports = {
     signup,
     login,
+    vote,
     post,
     updateLink,
     deleteLink,
